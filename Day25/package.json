@@ -1,0 +1,15 @@
+{
+  "name": "aoc2020-08",
+  "version": "1.0.0",
+  "description": "",
+  "main": "whatever.ts",
+  "scripts": {
+    "watch1": "npx ts-node-dev --respawn src/part1.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "ts-node-dev": "^1.1.1",
+    "typescript": "^4.1.3"
+  }
+}
