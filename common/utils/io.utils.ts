@@ -4,7 +4,7 @@ export const readAllLinesFilterEmpty = (path: string): string[] => readAllLines(
     .filter((line) => line.length > 0);
 
 export const readAllLines = (path: string): string[] => fs.readFileSync(path, 'utf-8')
-    .split('\n');
+    .split('\r\n');
 
 export const readAllNumbers = (path: string): number[] =>
     readAllLinesFilterEmpty(path).map((n) => parseInt(n));
