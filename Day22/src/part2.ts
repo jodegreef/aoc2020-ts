@@ -18,33 +18,11 @@ const solve = (filename) => {
     console.log("------");
 
 
-    return playRound(1, player1, player2, []);
+    return playRound(1, player1, player2);
 
 }
 
-const alreadyPlayedThisRoundSlow = (player1: number[], player2: number[], previousRounds: number[][][]) => {
-    for (let i = 0; i < previousRounds.length; i++) {
-        const a  = previousRounds[i][0];
-        const b  = previousRounds[i][1];
-        // console.log(JSON.stringify(previousRounds));
-        // console.log(JSON.stringify(player1));
-        // console.log(JSON.stringify(player2));
-        var alreadyplayed = (JSON.stringify(a)===JSON.stringify(player1)) ||  (JSON.stringify(b)===JSON.stringify(player2));
-        if (alreadyplayed)
-            return true;
-    }
-    return false;
-}
-const alreadyPlayedThisRound = (player1: number[], player2: number[], previousRounds: string[]) => {
-        for (let i = 0; i < previousRounds.length; i++) {
-        var alreadyplayed = (JSON.stringify(player1) + "-" + JSON.stringify(player2) === previousRounds[i]);
-        if (alreadyplayed)
-            return true;
-    }
-    return false;
-}
-
-const playRound = (level: number, player1: number[], player2: number[], previousRounds: string[]) => {
+const playRound = (level: number, player1: number[], player2: number[], previousRounds = new Set<string>()) => {
     debugLog("=== Game "+level+" ===");
     let round = 0;
     do {
@@ -57,17 +35,16 @@ const playRound = (level: number, player1: number[], player2: number[], previous
 
 
         let winner = -1; // undetermined
-
-
         
-        if (alreadyPlayedThisRound(player1, player2, previousRounds))
+        const currentRoundAsString = JSON.stringify(player1); // + "-" + JSON.stringify(player2); // first players deck is already enough 
+        if (previousRounds.has(currentRoundAsString))
         {
             debugLog("already played this combo");
             return 1;  // player 1 wins
         } else {
-            previousRounds.push(JSON.stringify(player1) + "-" + JSON.stringify(player2));
-            let topCard1 = player1.splice(0,1)[0];
-            let topCard2 = player2.splice(0,1)[0];
+            previousRounds.add(currentRoundAsString);
+            let topCard1 = player1.shift()!;
+            let topCard2 = player2.shift()!;
 
             debugLog("Player 1 plays: " + topCard1);
             debugLog("Player 2 plays: " + topCard2);
@@ -76,10 +53,10 @@ const playRound = (level: number, player1: number[], player2: number[], previous
             if (player1.length >= topCard1 && player2.length >= topCard2) {
                 debugLog("Playing a sub-game to determine the winner...");
                 //determine winner by recursive
-                let subdeck1 = [...player1].slice(0, topCard1);
-                let subdeck2 = [...player2].slice(0, topCard2);
+                let subdeck1 = player1.slice(0, topCard1);
+                let subdeck2 = player2.slice(0, topCard2);
 
-                winner = playRound(level+1, subdeck1, subdeck2, []);
+                winner = playRound(level+1, subdeck1, subdeck2);
                 debugLog(`Player ${winner} wins round ${round} of game ${level}! (RECURSE)`);
             }
             else {
@@ -89,10 +66,8 @@ const playRound = (level: number, player1: number[], player2: number[], previous
 
             if (winner === 1) {
                 player1.push(topCard1, topCard2);
-  //              player1 = [...player1 , topCard1, topCard2];
             }
             else{
-//                player2 = [...player2 , topCard2, topCard1];
                 player2.push(topCard2, topCard1);
    
             }
@@ -102,7 +77,9 @@ const playRound = (level: number, player1: number[], player2: number[], previous
     let winner = player1.length ? 1 : 2;
     let winnersDeck = player1.length ? player1 : player2;
     if (level === 1) {
+        console.log("OVERALL GAME WINNER FOUND:")
         let score = winnersDeck.reverse().reduce((accumulator, current, idx) =>  accumulator+current*(idx+1));
+        console.log(winnersDeck);
         console.log("SCORE: " + score);
     }
     return winner;
@@ -114,7 +91,10 @@ let debugLog = (any) => {};
 
 console.log("solution sample: " + solve("input_test.txt"));
 console.log("solution: " + solve("input.txt"));
-//console.log(alreadyPlayedThisRound([1,2], [3,4], ["[1,2]-[3,4]"]));
+
+
+console.log("DONE");
+
 
 
 
